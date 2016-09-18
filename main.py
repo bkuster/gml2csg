@@ -8,6 +8,6 @@ parser.add_argument('--gml', help='the GML file name', required=True)
 parser.add_argument('--csg', help='output file name', required=True)
 args = parser.parse_args()
 
-bridge = Bridge(args.id)
+bridge = Bridge(args.id, '3')
 bridge.parse(args.gml)
 bridge.write(args.csg)
