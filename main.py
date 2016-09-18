@@ -1,6 +1,6 @@
 import argparse
 
-from bridge.Bridge import Bridge
+from Bridge import Bridge
 
 parser = argparse.ArgumentParser(description='Read a city GMLm, export CSG')
 parser.add_argument('--id', help='the GML ID of the bridge model to extract', required=True)

@@ -1,14 +1,23 @@
 import re
-from sympy import Point3D, Plane
+import string
+import random
+from sympy import Point3D, Plane, N
 
-from util.XmlReader import XmlReader
+from XmlReader import XmlReader
 
 class ConstructionElement():
     def __init__(self, elem):
         self.elem = elem
+        self.name = ''
         self.planes = []
 
     def parse(self, lod, ns):
+        name = self.elem.find('./gml:name', ns)
+        if not name.text:
+            self.name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
+        else:
+            self.name = re.sub(' ', '_', name.text)
+
         surfaces = self.elem.findall('./brid:lod{0}Geometry/gml:MultiSurface/gml:surfaceMember/gml:Polygon'.format(lod), ns)
         for surf in surfaces:
             exterior = surf.find('./gml:exterior/gml:LinearRing', ns)
@@ -24,7 +33,28 @@ class ConstructionElement():
                 points.append(Point3D(point))
 
             self.planes.append(Plane(*points))
-        pass
+
+    def writeExteriorCsg(self):
+        solidDef = 'solid {0}{1} = '.format(self.name, '-exterior')
+        for i in range(len(self.planes)):
+            plane = self.planes[i]
+            pointStr = '{0}'.format(self.__convertSympy(plane.p1.args))
+            normStr = '{0}'.format(self.__convertSympy(plane.normal_vector))
+
+            solidDef += 'plane({0};{1})'.format(
+                re.sub('\\(|\\)', '', pointStr),
+                re.sub('\\(|\\)', '', normStr)
+            )
+
+            if i == len(self.planes)-1:
+                solidDef += ';\n'
+            else:
+                solidDef += ' and '
+
+        return solidDef
+
+    def __convertSympy(self, tup):
+        return tuple([N(x) for x in tup])
 
 class Bridge():
     def __init__(self, id, lod):
@@ -44,4 +74,20 @@ class Bridge():
             elem.parse(self.lod, reader.ns)
 
     def write(self, fileName):
-        pass
+        text = 'algebraic3d\n'
+        exteriors = []
+        for elem in self.outerConstruction:
+            exteriors.append(elem.name + '-exterior')
+            text += elem.writeExteriorCsg()
+
+        text += 'solid bridge = '
+        for i in range(len(exteriors)):
+            text += exteriors[i]
+            if i == len(exteriors)-1:
+                text += ';\n'
+            else:
+                text += ' or '
+
+        text += 'tlo bridge;'
+        with open(fileName, 'w') as f:
+            f.write(text)
