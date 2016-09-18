@@ -4,10 +4,6 @@
 # Created: 	2016-09-16
 # Version: 	0.1
 # Purpose: 	Reads the XML Tree of a CityGML Bridge and writes a CSG representing it
-#
-# This software is provided under the GNU GPLv2
-# WITHOUT ANY WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
-# If no license was provided, see <http://www.gnu.org/licenses/>
 # -----------------------------------------------------------------------------
 import re
 import string
