@@ -1,11 +1,12 @@
-from ../util.XmlReader import XmlReader
+from util.XmlReader import XmlReader
 class Bridge():
     def __init__(self, id):
         self.id = id
+        self.reader = XmlReader()
 
     def parse(self, fileName):
-        reader = new XmlReader()
-        self.xmlRoot = reader.getById(fileName, self.id)
+        self.xmlRoot = self.reader.getById(fileName, self.id)
 
     def write(self, fileName):
+        print(self.xmlRoot.attrib.items())
         pass

@@ -2,11 +2,11 @@ import xml.etree.ElementTree as ET
 import re
 
 class XmlReader():
-    def __init__(self, gml):
+    def __init__(self):
         self.ns = {
-            'brid':'http://www.opengis.net/citygml/bridge/2.0'
+            'brid':'http://www.opengis.net/citygml/bridge/2.0',
             'bldg':'http://www.opengis.net/citygml/building/2.0',
-            'core':'http://www.opengis.net/citygml/profiles/base/2.0',
+            'core':'http://www.opengis.net/citygml/2.0',
             'gml':'http://www.opengis.net/gml',
             'xlink':'http://www.w3.org/1999/xlink'
         }
@@ -16,5 +16,5 @@ class XmlReader():
 
     def getById(self, fileName, id):
         root = self.parse(fileName)
-        modelDef = root.find("./CityModel/cityObjectMember[@gml:id='{0}']".format(id))
+        modelDef = root.find("./core:cityObjectMember/*[@gml:id='{0}']".format(id), self.ns)
         return modelDef
